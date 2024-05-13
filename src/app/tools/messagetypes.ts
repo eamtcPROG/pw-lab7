@@ -1,5 +1,9 @@
 import { MessageDto } from '../dto/message.dto';
-
+interface Message {
+  code: number;
+  type: number;
+  label: string;
+}
 export class MessageTypes {
   public static MESSAGE_SUCCESS = 1;
   public static MESSAGE_WARNING = 2;
@@ -18,7 +22,7 @@ export class MessageTypes {
 
   public static OBJECT_ALREADY_IN_DATABASE = 2009;
 
-  public static MESSAGES = {
+  public static MESSAGES: { [key: number]: Message } = {
     201: {
       code: 201,
       type: MessageTypes.MESSAGE_SUCCESS,
@@ -84,7 +88,7 @@ export class MessageTypes {
     const item = MessageTypes.MESSAGES[key];
 
     const rez = new MessageDto();
-    rez.code = item.code;
+    rez.code = item.code.toString();
     rez.message = item.label;
     rez.mestype = item.type;
 
