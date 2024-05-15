@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '../repositories/user.repository';
 import { UserDto } from 'src/user/dto/user.dto';
@@ -6,6 +6,7 @@ import { UserDto } from 'src/user/dto/user.dto';
 import IService from 'src/app/interfaces/iservice.interface';
 import { GeneralService } from 'src/app/services/general.service';
 import Idto from 'src/app/interfaces/idto.interface';
+import { AuthService } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class UserService
@@ -15,6 +16,8 @@ export class UserService
   constructor(
     private readonly userRepository: UserRepository,
     protected readonly configService: ConfigService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {
     super(userRepository);
   }
@@ -39,17 +42,17 @@ export class UserService
   }
 
   async parseForSave(postObj: any): Promise<Idto> {
-    const obj: UserDto = new UserDto();
+    let obj: UserDto = new UserDto();
 
     if (postObj.hasOwnProperty('id')) obj.id = postObj.id;
     if (postObj.hasOwnProperty('email')) obj.email = postObj.email;
     if (postObj.hasOwnProperty('name')) obj.name = postObj.name;
     if (postObj.hasOwnProperty('surname')) obj.surname = postObj.surname;
     if (postObj.hasOwnProperty('roles')) obj.roles = postObj.roles;
-    // if (postObj.hasOwnProperty('password')) {
-    //   obj.password = postObj.password;
-    //   obj = await this.authService.processPassword(obj);
-    // }
+    if (postObj.hasOwnProperty('password')) {
+      obj.password = postObj.password;
+      obj = (await this.authService.processPassword(obj)) as UserDto;
+    }
 
     return obj;
   }

@@ -14,10 +14,12 @@ import { UserService } from 'src/user/services/user.service';
 import { UserController } from 'src/user/controllers/user.controller';
 
 import { HttpModule } from '@nestjs/axios';
+import AuthModule from 'src/auth/auth.module';
 
 @Module({
   imports: [
     forwardRef(() => AppModule),
+    forwardRef(() => AuthModule),
 
     HttpModule.register({}),
 

@@ -12,6 +12,7 @@ import Ischema from './interfaces/ischema.interface';
 
 import { CommonTools } from './tools/commontools';
 import UserModule from 'src/user/user.module';
+import AuthModule from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import UserModule from 'src/user/user.module';
       {},
     ),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, Idto, Ischema, CommonTools],

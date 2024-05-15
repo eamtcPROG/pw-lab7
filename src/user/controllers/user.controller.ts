@@ -38,6 +38,36 @@ import Idto from 'src/app/interfaces/idto.interface';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiOperation({ summary: 'Add user ' })
+  @ApiConsumes('application/json')
+  @ApiBody({ type: PostUserDto })
+  @ApiOkResponse({
+    type: ResultObjectDTO,
+    description: 'Special obj in type: ResultObjectDTO',
+  })
+  @ApiNotFoundResponse({
+    type: ResultObjectDTO,
+    description: 'User not found',
+  })
+  @Post('/')
+  @UseInterceptors(new PrepareObjectBody(PostUserDto))
+  public async add(
+    @Res() res: Response,
+    @Body() body: Idto,
+  ): Promise<ResultObjectDTO> {
+    const obj = await this.userService.save(body);
+
+    if (obj == null) {
+      return await ToolsGenerateResponse.getErrObject(
+        res,
+        HttpStatus.NOT_FOUND,
+        MessageTypes.OBJECT_NOT_FOUND,
+      );
+    }
+
+    return ToolsGenerateResponse.getOkObject(res, obj);
+  }
+
   @ApiOperation({ summary: 'Get User list' })
   @ApiOkResponse({
     type: ResultListDTO,
@@ -120,37 +150,7 @@ export class UserController {
     return await ToolsGenerateResponse.getOkObject(res, obj);
   }
 
-  @ApiOperation({ summary: 'Add user ' })
-  @ApiConsumes('application/json')
-  @ApiBody({ type: PostUserDto })
-  @ApiOkResponse({
-    type: ResultObjectDTO,
-    description: 'Special obj in type: ResultObjectDTO',
-  })
-  @ApiNotFoundResponse({
-    type: ResultObjectDTO,
-    description: 'User not found',
-  })
-  @Post('/')
-  @UseInterceptors(new PrepareObjectBody(PostUserDto))
-  public async add(
-    @Res() res: Response,
-    @Body() body: Idto,
-  ): Promise<ResultObjectDTO> {
-    const obj = await this.userService.save(body);
-
-    if (obj == null) {
-      return await ToolsGenerateResponse.getErrObject(
-        res,
-        HttpStatus.NOT_FOUND,
-        MessageTypes.OBJECT_NOT_FOUND,
-      );
-    }
-
-    return ToolsGenerateResponse.getOkObject(res, obj);
-  }
-
-  @ApiOperation({ summary: 'Delete User by ID by Admin' })
+  @ApiOperation({ summary: 'Delete User by ID' })
   @ApiParam({ name: 'id', description: 'User id', required: true })
   @ApiOkResponse({
     type: ResultObjectDTO,
@@ -181,7 +181,7 @@ export class UserController {
     );
   }
 
-  @ApiOperation({ summary: 'Update user by admin by ID' })
+  @ApiOperation({ summary: 'Update user by ID' })
   @ApiParam({ name: 'id', description: 'User id', required: true })
   @ApiBody({ type: UserDto })
   @ApiConsumes('application/json')
