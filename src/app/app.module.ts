@@ -11,6 +11,7 @@ import Idto from './interfaces/idto.interface';
 import Ischema from './interfaces/ischema.interface';
 
 import { CommonTools } from './tools/commontools';
+import UserModule from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CommonTools } from './tools/commontools';
       `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@transport.cumran5.mongodb.net/${process.env.DATABASE_DBNAME}?retryWrites=true&w=majority`,
       {},
     ),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, Idto, Ischema, CommonTools],

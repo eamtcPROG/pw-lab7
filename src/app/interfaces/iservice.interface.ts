@@ -10,11 +10,11 @@ export default interface IService {
     id: string,
     populate?: RequestPopulateDTO,
     idLanguage?: string,
-  ): Promise<Idto>;
-  getAll(options: RequestListDTO): Promise<Idto[]>;
+  ): Promise<Idto | null>;
+  getAll(options: RequestListDTO): Promise<Idto[] | null>;
   getCount(options: RequestListDTO): Promise<number>;
   parseForSave(postObj: any): Promise<Idto>;
   parseForSaveValue(postObj: any, id: string): Idto;
   delete(id: string): Promise<ResultDeleteDTO>;
-  save(postObj: Idto, id?: string): Promise<Idto>;
+  save(postObj: Idto, id?: string): Promise<Idto | null>;
 }

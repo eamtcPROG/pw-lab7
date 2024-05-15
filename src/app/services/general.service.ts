@@ -13,7 +13,7 @@ import { RepositoryInterface } from '../interfaces/repository.interface';
 @Injectable()
 export abstract class GeneralService<
   Repo extends RepositoryInterface,
-  ValueService extends IService,
+  ValueService extends IService | null,
 > {
   constructor(
     protected readonly repository: Repo,
