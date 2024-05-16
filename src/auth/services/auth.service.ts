@@ -2,7 +2,7 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
-import { PostUserDto, UserDto } from 'src/user/dto/user.dto';
+import { LoginDto, PostUserDto, UserDto } from 'src/user/dto/user.dto';
 import { UserService } from 'src/user/services/user.service';
 
 import ResultSignInDTO from '../dto/resultsignin.dto';
@@ -62,20 +62,22 @@ export class AuthService {
 
   public getPayLoad(obj: ResultSignInDTO): JwtPayload {
     const user = obj.obj ? obj.obj : null;
-    if (!user) return { id: '', email: '' };
+    if (!user) return { id: '', email: '', roles: [] };
     const rez: JwtPayload = {
       id: user.id ? user.id : '',
       email: user.email ? user.email : '',
+      roles: user.roles ? user.roles : [],
     };
     return rez;
   }
 
-  protected async getToken(obj: ResultSignInDTO): Promise<AccessTokenDto> {
+  async getToken(obj: ResultSignInDTO): Promise<AccessTokenDto> {
     const rez = new AccessTokenDto();
 
     const payLoadObj: JwtPayload = this.getPayLoad(obj);
 
-    const expVal = this.configService.get<string>('jwt.access_lifetime') || '0';
+    const expVal =
+      this.configService.get<string>('jwt.access_lifetime') || '10000';
     const expSec = parseInt(expVal) / 1000;
 
     rez.accesstoken = await this.jwtService.signAsync(payLoadObj, {
@@ -100,5 +102,20 @@ export class AuthService {
     const hash = await this.hashPass(pass);
 
     return hash;
+  }
+
+  async login(obj: LoginDto): Promise<ResultSignInDTO | null> {
+    let rez = new ResultSignInDTO();
+    const user = (await this.userService.getByField(
+      'email',
+      obj.email,
+    )) as UserDto;
+    if (!user) return null;
+    const isCorrect = await this.isCorrectPass(obj.password, user.password);
+    if (!isCorrect) return null;
+    rez.obj = user;
+    rez.roles = user.roles;
+    rez = await this.singIn_processAccessToken(rez);
+    return rez;
   }
 }

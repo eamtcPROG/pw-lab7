@@ -10,6 +10,7 @@ import { CommonTools } from 'src/app/tools/commontools';
 import { ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { PassportModule } from '@nestjs/passport';
+import { AuthController } from './controllers/auth.controller';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { PassportModule } from '@nestjs/passport';
 
     MongooseModule.forFeature([]),
   ],
-  controllers: [],
+  controllers: [AuthController],
   providers: [
     AuthService,
     AccessTokenStrategy,

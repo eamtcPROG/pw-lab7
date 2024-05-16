@@ -37,6 +37,7 @@ export class UserService
     if (obj.hasOwnProperty('name')) rez.name = obj.name;
     if (obj.hasOwnProperty('surname')) rez.surname = obj.surname;
     if (obj.hasOwnProperty('roles')) rez.roles = obj.roles;
+    if (obj.hasOwnProperty('password')) rez.password = obj.password;
 
     return rez;
   }

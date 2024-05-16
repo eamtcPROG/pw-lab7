@@ -87,3 +87,19 @@ export class PostUserDto implements Idto {
   })
   roles: string[];
 }
+
+export class LoginDto implements Idto {
+  @ApiProperty({
+    example: 'examplde@example.com',
+    description: 'User email - unique in system',
+    type: 'string',
+  })
+  email: string;
+
+  @ApiProperty({
+    example: '*****',
+    description: 'User password (Hashed)',
+    type: 'string',
+  })
+  password: string;
+}

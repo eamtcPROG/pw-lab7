@@ -19,6 +19,7 @@ export class MessageTypes {
   public static JWT_REQUIRED = 1001;
   public static OBJECT_PARENT_NOT_FOUND = 1003;
   public static OBJECT_WRONG_BODY = 1004;
+  public static OBJECT_ERROR_LOGIN = 1005;
 
   public static OBJECT_ALREADY_IN_DATABASE = 2009;
 
@@ -63,6 +64,11 @@ export class MessageTypes {
       code: 2009,
       type: MessageTypes.MESSAGE_ERROR,
       label: 'Object is already in database',
+    },
+    1005: {
+      code: 1005,
+      type: MessageTypes.MESSAGE_ERROR,
+      label: 'INVALID CREDENTIALS',
     },
   };
 
