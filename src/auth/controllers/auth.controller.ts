@@ -9,6 +9,7 @@ import {
   //   Req,
   // UseGuards,
   Post,
+  UseGuards,
   //   Delete,
   //   Put,
 } from '@nestjs/common';
@@ -33,6 +34,7 @@ import ResultSignInDTO from '../dto/resultsignin.dto';
 import { AccessTokenDto } from '../dto/accesstoken.dto';
 import { LoginDto } from 'src/user/dto/user.dto';
 import { PrepareObjectBody } from 'src/app/interceptors/prepareobjectbody.interceptor';
+import { AccessTokenGuard } from 'src/app/guards/accessToken.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -76,6 +78,7 @@ export class AuthController {
     description: 'Comment not found',
   })
   @Post('/login')
+  @UseGuards(new AccessTokenGuard())
   @UseInterceptors(new PrepareObjectBody(LoginDto))
   public async login(
     @Res() res: Response,

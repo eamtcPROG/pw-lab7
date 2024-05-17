@@ -72,13 +72,13 @@ export class CommentRepository
           tAnd.push({ $or: tOr });
         }
       }
-      if (filter.field == 'idcomment') {
+      if (filter.field == 'idpost') {
         const tOr = [];
         const values = filter.values;
         if (Array.isArray(values)) {
           for (const value of values) {
             if (!value) continue;
-            tOr.push({ idcomment: this.getParsedId(value) });
+            tOr.push({ idpost: this.getParsedId(value) });
           }
         }
         if (tOr.length) {

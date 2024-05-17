@@ -11,6 +11,7 @@ import {
   Post,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -32,6 +33,8 @@ import { CommentService } from '../services/comment.service';
 import ResultListDTO from 'src/app/dto/resultlist.dto';
 import { ParseParamsList } from 'src/app/interceptors/parseparamslist.interceptor';
 import Idto from 'src/app/interfaces/idto.interface';
+import { AccessTokenGuard } from 'src/app/guards/accessToken.guard';
+import { Role } from 'src/app/tools/role';
 
 @ApiTags('comment')
 @Controller('comment')
@@ -49,6 +52,7 @@ export class CommentController {
     type: ResultObjectDTO,
     description: 'Comment not found',
   })
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @Post('/')
   @UseInterceptors(new PrepareObjectBody(PostCommentDto))
   public async add(
@@ -66,6 +70,37 @@ export class CommentController {
     }
 
     return ToolsGenerateResponse.getOkObject(res, obj);
+  }
+
+  @ApiOperation({ summary: 'Get Comment List by ID post' })
+  @ApiParam({ name: 'id', description: 'Comment id', required: true })
+  @ApiOkResponse({
+    type: CommentDto,
+    description: 'Special obj in type: ResultObjectDTO',
+  })
+  @ApiNotFoundResponse({
+    type: ResultObjectDTO,
+    description: 'Comment not found',
+  })
+  @Get('/by-post/:id')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
+  public async getByPostId(
+    @Res() res: Response,
+    @Param() params: any,
+  ): Promise<ResultObjectDTO> {
+    let obj = await this.commentService.getByFieldList('idpost', params.id, 20);
+    // ---------------------
+
+    if (!obj) obj = [];
+    // if (obj == null) {
+    //   return await ToolsGenerateResponse.getErrObject(
+    //     res,
+    //     HttpStatus.NOT_FOUND,
+    //     MessageTypes.OBJECT_NOT_FOUND,
+    //   );
+    // }
+
+    return await ToolsGenerateResponse.getOkObject(res, obj);
   }
 
   @ApiOperation({ summary: 'Get Comment list' })
@@ -98,6 +133,7 @@ export class CommentController {
     required: false,
   })
   @Get('/')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @UseInterceptors(ParseParamsList)
   public async getList(
     @Res() res: Response,
@@ -132,6 +168,7 @@ export class CommentController {
     description: 'Comment not found',
   })
   @Get('/:id')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   public async get(
     @Res() res: Response,
     @Param() params: any,
@@ -161,6 +198,7 @@ export class CommentController {
     description: 'Comment not found',
   })
   @Delete('/:id')
+  @UseGuards(new AccessTokenGuard([Role.ADMIN]))
   public async delete(
     @Res() res: Response,
     @Param() params: any,
@@ -194,6 +232,7 @@ export class CommentController {
     description: 'Comment not found',
   })
   @Put('/:id')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @UseInterceptors(new PrepareObjectBody(CommentDto))
   public async update(
     @Res() res: Response,

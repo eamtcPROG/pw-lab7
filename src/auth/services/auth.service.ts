@@ -62,11 +62,13 @@ export class AuthService {
 
   public getPayLoad(obj: ResultSignInDTO): JwtPayload {
     const user = obj.obj ? obj.obj : null;
-    if (!user) return { id: '', email: '', roles: [] };
+    if (!user) return { id: '', email: '', roles: [], name: '', surname: '' };
     const rez: JwtPayload = {
       id: user.id ? user.id : '',
       email: user.email ? user.email : '',
       roles: user.roles ? user.roles : [],
+      name: user.name ? user.name : '',
+      surname: user.surname ? user.surname : '',
     };
     return rez;
   }

@@ -76,6 +76,25 @@ export abstract class GeneralRepository {
     return new RegExp(v, 'i');
   }
 
+  protected async populateIdsObject(
+    repo: IRepository,
+    idsArr: string[],
+    populate?: RequestPopulateDTO,
+  ): Promise<any[]> {
+    if (idsArr == undefined) return [];
+    const rez = new Array<any>();
+
+    if (idsArr.length) {
+      await Promise.all(
+        idsArr.map(async (id) => {
+          const t = await repo.findById(this.getParsedId(id), populate);
+          rez.push(t);
+        }),
+      );
+    }
+    return rez;
+  }
+
   async findListByField(
     field: string,
     value: any,
@@ -250,13 +269,16 @@ export abstract class GeneralRepository {
     let rez = this.processAgregateForList(this._model, options, info);
 
     rez = this.parseAdminMongoQuery(rez, info);
+    // rez = this.parseAdminPopulate(rez, info);
 
     const data = await rez.exec();
 
-    const objects = [];
+    const objects: any = [];
+
+    if (!info) return objects;
 
     for (const i in data) {
-      const t = await this.populateObj(data[i], info?.populate);
+      const t = await this.populateObj(data[i], info.populate);
       objects.push(t);
     }
 
@@ -306,8 +328,7 @@ export abstract class GeneralRepository {
 
   parseAdminMongoQuery(rez: any, data?: RequestListDTO): any {
     if (!data) return rez;
-
-    if (data.sortcriteria != null) {
+    if (data.sortcriteria && data.sortcriteria.length > 0) {
       const t: any = {};
       for (const i in data.sortcriteria) {
         const sc: RequestSortCriteriaDTO = data.sortcriteria[i];
@@ -320,6 +341,45 @@ export abstract class GeneralRepository {
       rez = rez.skip(s);
       rez = rez.limit(data.onpage);
     }
+    return rez;
+  }
+
+  parseAdminPopulate(rez: any, data?: RequestListDTO): any {
+    if (!data) return rez;
+    if (data.populate != null && data.populate.populates != null) {
+      rez = this.parseAdminPopulateItem(rez, data.populate);
+    }
+
+    return rez;
+  }
+
+  parseAdminPopulateItem(rez: any, data?: RequestPopulateDTO): any {
+    if (!data) return rez;
+    if (data != null && data.populates != null) {
+      for (const i in data.populates) {
+        if (data.populates[i].includes('.')) {
+          // Handle nested population path
+          const paths = data.populates[i].split('.');
+          const populateObject: any = {};
+          let currentObject = populateObject;
+
+          for (let j = 0; j < paths.length; j++) {
+            currentObject['path'] = paths[j];
+            if (j < paths.length - 1) {
+              const newObject = {};
+              currentObject['populate'] = newObject;
+              currentObject = newObject;
+            }
+          }
+
+          rez = rez.populate(populateObject);
+        } else {
+          // Handle non-nested population path
+          rez = rez.populate(data.populates[i]);
+        }
+      }
+    }
+
     return rez;
   }
 }

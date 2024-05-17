@@ -20,6 +20,7 @@ export class MessageTypes {
   public static OBJECT_PARENT_NOT_FOUND = 1003;
   public static OBJECT_WRONG_BODY = 1004;
   public static OBJECT_ERROR_LOGIN = 1005;
+  public static INVALID_ROLE = 1006;
 
   public static OBJECT_ALREADY_IN_DATABASE = 2009;
 
@@ -69,6 +70,11 @@ export class MessageTypes {
       code: 1005,
       type: MessageTypes.MESSAGE_ERROR,
       label: 'INVALID CREDENTIALS',
+    },
+    1006: {
+      code: 1006,
+      type: MessageTypes.MESSAGE_ERROR,
+      label: 'INVALID ROLE',
     },
   };
 

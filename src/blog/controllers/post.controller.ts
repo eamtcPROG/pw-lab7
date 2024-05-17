@@ -11,6 +11,7 @@ import {
   Post,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -32,6 +33,9 @@ import { PostService } from '../services/post.service';
 import ResultListDTO from 'src/app/dto/resultlist.dto';
 import { ParseParamsList } from 'src/app/interceptors/parseparamslist.interceptor';
 import Idto from 'src/app/interfaces/idto.interface';
+import RequestListDTO from 'src/app/dto/requestlist.dto';
+import { AccessTokenGuard } from 'src/app/guards/accessToken.guard';
+import { Role } from 'src/app/tools/role';
 
 @ApiTags('post')
 @Controller('post')
@@ -50,6 +54,7 @@ export class PostController {
     description: 'Post not found',
   })
   @Post('/')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @UseInterceptors(new PrepareObjectBody(PostPostDto))
   public async add(
     @Res() res: Response,
@@ -65,7 +70,12 @@ export class PostController {
       );
     }
 
-    return ToolsGenerateResponse.getOkObject(res, obj);
+    const totalObjects = await this.postService.getCount(new RequestListDTO());
+
+    return ToolsGenerateResponse.getOkObject(res, {
+      obj,
+      totalpages: Math.ceil(totalObjects / 10),
+    });
   }
 
   @ApiOperation({ summary: 'Get Post list' })
@@ -98,6 +108,7 @@ export class PostController {
     required: false,
   })
   @Get('/')
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @UseInterceptors(ParseParamsList)
   public async getList(
     @Res() res: Response,
@@ -131,6 +142,7 @@ export class PostController {
     type: ResultObjectDTO,
     description: 'Post not found',
   })
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @Get('/:id')
   public async get(
     @Res() res: Response,
@@ -160,6 +172,7 @@ export class PostController {
     type: ResultObjectDTO,
     description: 'Post not found',
   })
+  @UseGuards(new AccessTokenGuard([Role.ADMIN]))
   @Delete('/:id')
   public async delete(
     @Res() res: Response,
@@ -193,6 +206,7 @@ export class PostController {
     type: ResultObjectDTO,
     description: 'Post not found',
   })
+  @UseGuards(new AccessTokenGuard([Role.BASIC, Role.ADMIN]))
   @Put('/:id')
   @UseInterceptors(new PrepareObjectBody(PostDto))
   public async update(

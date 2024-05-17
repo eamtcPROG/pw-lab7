@@ -14,7 +14,7 @@ import { AuthController } from './controllers/auth.controller';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: `${process.env.JWT_ACCESS_SECRET}`,
       signOptions: { expiresIn: '1d' },

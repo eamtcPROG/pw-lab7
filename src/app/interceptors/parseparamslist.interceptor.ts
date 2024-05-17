@@ -118,8 +118,8 @@ export class ParseParamsList implements NestInterceptor {
     requestListDTO.sortcriteria =
       this.prepareRequestSortCriteriaDTO(query) ?? [];
     requestListDTO.populate = this.prepareRequestPopulateDTO(query);
-    requestListDTO.criteria = this.prepareRequestCriteriaDTO(query) ?? [];
-    requestListDTO.range = this.prepareRequestRangeDTO(query) ?? [];
+    // requestListDTO.criteria = this.prepareRequestCriteriaDTO(query) ?? [];
+    // requestListDTO.range = this.prepareRequestRangeDTO(query) ?? [];
 
     return requestListDTO;
   }
